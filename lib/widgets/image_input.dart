@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+class ImageInput extends StatefulWidget {
+  const ImageInput({super.key, required this.onPickImage});
+  final void Function(File image) onPickImage;
+
+  @override
+  State<ImageInput> createState() {
+    // TODO: implement createState
+    return _ImageInputState();
+  }
+}
+
+class _ImageInputState extends State<ImageInput> {
+  File? _selectedImage;
+  void _takePicture() async {
+    final imagePickeer = ImagePicker();
+
+    final pickImage = await imagePickeer.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 600,
+    );
+
+    if (pickImage == null) return;
+
+    setState(() {
+      _selectedImage = File(pickImage.path);
+    });
+
+    widget.onPickImage(_selectedImage!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget content = TextButton.icon(
+      icon: Icon(Icons.camera),
+      onPressed: _takePicture,
+      label: Text('Take Picture'),
+    );
+
+    if (_selectedImage != null) {
+      content = GestureDetector(
+        onTap: _takePicture,
+        child: Image.file(
+          _selectedImage!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      );
+    }
+    // TODO: implement build
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+        width: 1,
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      )),
+      height: 250,
+      width: double.infinity,
+      child: content,
+    );
+  }
+}
